@@ -1,0 +1,21 @@
+version: '3.3'
+
+services:
+  fbm_etl:
+    build: "."
+    depends_on:
+    - "fbm_db"
+    links:
+    - fbm_db:fbm_db
+
+  fbm_db:
+    image: mysql/mysql-server:5.7
+    volumes:
+      - ./db:/docker-entrypoint-initdb.d
+    ports: 
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: facebook_messenger
+      MYSQL_USER: jeremy
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
