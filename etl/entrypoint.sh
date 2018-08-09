@@ -2,5 +2,5 @@ until echo '\q' | mysql -h"$MYSQL_HOST" -P"$MYSQL_PORT" -u"$MYSQL_USER" -p"$MYSQ
     >&2 echo "MySQL is unavailable - sleeping"
     sleep 2
 done
-cd /var/app/src/ && python3.7 etl.py
+cd /var/app/etl/src/ && python3.7 etl.py
 echo "[INFO] Messages loaded"

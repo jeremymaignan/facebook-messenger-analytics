@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   fbm_etl:
-    build: "."
+    build: "./etl"
     depends_on:
     - "fbm_db"
     links:
@@ -19,3 +19,12 @@ services:
       MYSQL_USER: jeremy
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: password
+
+  fbm_api:
+    build: "./api"
+    depends_on:
+      - "fbm_etl"
+    links:
+      - fbm_db:fbm_db
+    ports: 
+      - "5000:5000"
