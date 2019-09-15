@@ -13,7 +13,7 @@
 
 import os
 import json
-from utils.message import Messages
+from entities.message import Messages
 from utils.conf_manager import get_conf
 from utils.preprocessing import Preprocessing
 from utils.MySql import MySql
@@ -33,12 +33,15 @@ conversation_blank_value = {
     "participants": [],
     "title": ""  
 }
+import os
+path = "../messages/inbox/"
 
 def get_conversations_name():
-    conversations_name = os.listdir('../messages')
+    conversations_name = os.listdir(path)
+    
+    # Ignore folders which are not a convo    
     for folder_to_ignore in folders_to_ignore:
-        if folder_to_ignore in conversations_name:
-            conversations_name.remove(folder_to_ignore)
+        if folder_to_ignore in conversations_name: conversations_name.remove(folder_to_ignore)
     return conversations_name
 
 def open_conversations(filename):
@@ -48,7 +51,6 @@ def open_conversations(filename):
 def parse_conversation(conversation_json):
     messages = []
     for message in conversation_json["messages"]:
-
         for key in message_blank_value.keys():
             if key not in message:
                 message[key] = message_blank_value[key]
@@ -77,22 +79,23 @@ def parse_conversation(conversation_json):
 def loading(db):
     conversations_name = get_conversations_name()
     print("[INFO] {} conversations found".format(len(conversations_name)))
-
+    
     for conversation_name in tqdm(conversations_name):
-        conversation_json = open_conversations("../messages/{}/message.json".format(conversation_name))
+        conversation_json = open_conversations("{}/{}/message_1.json".format(path, conversation_name))
+        #print(conversation_json)
         messages = parse_conversation(conversation_json)
         if len(messages) > get_conf("minimum_nb_message") and \
             len(messages) < get_conf("maximum_nb_message"):
-            #print("[INFO] {} messages in {}".format(len(messages), conversation_json["title"].encode('latin1').decode('utf8')))
+            print("[INFO] {} messages in {}".format(len(messages), conversation_json["title"].encode('latin1').decode('utf8')))
             for message in messages:
                 db.save_message(message, conversation_name)
-
+            db.commit()
 if __name__ == '__main__':
+
     db = MySql()
     preproc = Preprocessing(db)
 
     loading(db)
-    preproc.preprocess_conversations()
     preproc.preprocess_senders()
-
+    preproc.preprocess_conversations()
 

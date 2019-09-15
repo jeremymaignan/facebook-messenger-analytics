@@ -12,7 +12,7 @@ class MySql():
                 charset='utf8mb4', 
                 use_unicode=True
             )
-            self.cursor = self.conn.cursor()
+            self.cursor = self.conn.cursor(dictionary=True)
             print("[INFO] Connected to the database {}".format(get_conf("mysql_database")))
         except Exception as err:
             print("[ERROR] Cannot connect to the Database. {}".format(err))
@@ -38,14 +38,15 @@ class MySql():
                 uuid
             )
             self.cursor.execute(query, values)
-            self.conn.commit()
         except Exception as err:
             print("[ERROR] Cannot insert message in Database. {}".format(err))
             #print(message)
 
     def messages_by_sender_by_conversation(self):
         query = """
-        SELECT title, uuid, sender, COUNT(*), MIN(sent_at), MAX(sent_at) FROM messages
+        SELECT title, uuid, sender, COUNT(*) AS nb_messages, MIN(sent_at) AS first_message_sent_at, MAX(sent_at) AS last_message_sent_at
+        FROM messages
+        WHERE sender <> '' AND title <> '' 
         GROUP BY title, uuid, sender;
         """
         try:
@@ -91,6 +92,13 @@ class MySql():
             self.conn.commit()
         except Exception as err:
             print("[ERROR] Cannot fill conversation table. Error: {}".format(err))
+    
+    def commit(self):
+        self.conn.commit()
 
     def __del__(self):
+        try:
+            self.conn.commit()
+        except:
+            pass
         self.conn.close()

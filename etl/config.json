@@ -1,8 +1,8 @@
 {
-	"mysql_host": "fbm_db",
+	"mysql_host": "fbm_db", 
 	"mysql_user": "jeremy",
 	"mysql_password": "password",
 	"mysql_database": "facebook_messenger",
-	"minimum_nb_message": 10, 
+	"minimum_nb_message": 1, 
 	"maximum_nb_message": 1000000
 }

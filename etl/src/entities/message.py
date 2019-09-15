@@ -3,7 +3,7 @@ import mysql.connector
 
 class Messages():
     def __init__(self, sender, timestamp_ms, content, gifs, photos, share, sticker, video, type_, title, is_still_participant, participants, thread_type, thread_path):
-        participants = [x.encode('latin1').decode('utf8') for x in participants]
+        participants = [x["name"].encode('latin1').decode('utf8') for x in participants]
         self.sender = sender.encode('latin1').decode('utf8')
         self.sent_at = datetime.fromtimestamp(timestamp_ms/1000).strftime('%Y-%m-%d %H:%M:%S')
         self.content = content.encode('latin1').decode('utf8')

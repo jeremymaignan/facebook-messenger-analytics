@@ -1,2 +1,2 @@
-mysql-connector==2.1.6
+mysql-connector==2.2.9
 tqdm==4.24.0

@@ -1,9 +1,8 @@
 FROM python:3.7
 
-RUN apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install mysql-server
-
 COPY . /var/app/etl/
+#VOLUME ../messages /var/app/etl/messages/
+
 WORKDIR /var/app/etl/
 
 RUN pip3.7 install -r requirements.txt

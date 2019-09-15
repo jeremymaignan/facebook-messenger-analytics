@@ -14,7 +14,6 @@ class Preprocessing():
         senders = self.db.messages_by_sender_by_conversation()
         if [] == senders:
             return None
-        for row in tqdm(senders):
-            #print(row)
-            self.db.insert_sender(row[0], row[1], row[2], row[3], row[4], row[5])
+        for sender in tqdm(senders):
+            self.db.insert_sender(sender["title"], sender["uuid"], sender["sender"], sender['nb_messages'], sender['first_message_sent_at'], sender['last_message_sent_at'])
         print("[INFO] Senders table filled")
