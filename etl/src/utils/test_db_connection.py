@@ -1,6 +1,9 @@
-import mysql.connector 
-from conf_manager import get_conf
 import time
+
+import mysql.connector
+
+from conf_manager import get_conf
+
 
 def try_connection():
     try:

@@ -20,11 +20,11 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_PASSWORD: password
 
-  fbm_api:
-    build: "./api"
-    depends_on:
-      - "fbm_etl"
-    links:
-      - fbm_db:fbm_db
-    ports: 
-      - "5000:5000"
+  # fbm_api:
+  #   build: "./api"
+  #   depends_on:
+  #     - "fbm_etl"
+  #   links:
+  #     - fbm_db:fbm_db
+  #   ports: 
+  #     - "5000:5000"

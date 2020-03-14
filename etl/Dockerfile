@@ -5,7 +5,8 @@ COPY . /var/app/etl/
 
 WORKDIR /var/app/etl/
 
-RUN pip3.7 install -r requirements.txt
+RUN pip3.7 install -q -r requirements.txt
+RUN mkdir /var/log/facebook_messenger/
 
 ENV MYSQL_DATABASE=facebook_messenger \
     MYSQL_USER=jeremy \
