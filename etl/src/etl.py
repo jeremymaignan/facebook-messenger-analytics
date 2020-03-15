@@ -32,11 +32,11 @@ def get_conversations_names():
 def parse_conversation(conversation_json, conversation_name):
     schema = MessageSchema()
     messages = []
-    for message in conversation_json["messages"][0:100]:
+    for message in conversation_json["messages"][0:200]:
         participants = [decode_str(x["name"]) for x in conversation_json["participants"]]
         messages.append(schema.load({
             "sender": decode_str(message["sender_name"]),
-            "sent_at": datetime.fromtimestamp(message["timestamp_ms"]/1000.0).isoformat(),
+            "sent_at": datetime.fromtimestamp(message["timestamp_ms"] / 1000.0).isoformat(),
             "content": message.get("content", None),
             "gifs": ', '.join([x["uri"] for x in message["gifs"]]) if "gifs" in message else None,
             "photos": ', '.join([x["uri"] for x in message["photos"]]) if "photos" in message else None,
@@ -44,7 +44,7 @@ def parse_conversation(conversation_json, conversation_name):
             "sticker": message["sticker"].get("uri", None) if "sticker" in message else None,
             "video": ', '.join([x["uri"] for x in message["videos"]]) if "videos" in message else None,
             "type": message["type"],
-            "title": conversation_json["title"],
+            "title": decode_str(conversation_json["title"]),
             "conversation_id": conversation_name,
             "is_still_participant": conversation_json["is_still_participant"],
             "participants": ', '.join(participants),
@@ -66,5 +66,4 @@ def load_messages():
             Message.create(**x)
 
 if __name__ == '__main__':
-    log.info("ok")
     load_messages()
