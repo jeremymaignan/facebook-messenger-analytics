@@ -2,17 +2,17 @@ import time
 
 import mysql.connector
 
-from conf_manager import get_conf
+from utils import get_conf
 
 
 def try_connection():
     try:
         mysql.connector.connect(
-            host=get_conf("mysql_host"), 
-            user=get_conf("mysql_user"), 
-            password=get_conf("mysql_password"), 
-            database=get_conf("mysql_database"), 
-            charset='utf8mb4', 
+            host=get_conf("mysql_creds")["host"],
+            user=get_conf("mysql_creds")["user"],
+            password=get_conf("mysql_creds")["password"],
+            database=get_conf("mysql_creds")["database"],
+            charset='utf8mb4',
             use_unicode=True
         )
         print("Connected")

@@ -44,7 +44,7 @@ def parse_conversation(conversation_json, conversation_name):
             "sticker": message["sticker"].get("uri", None) if "sticker" in message else None,
             "video": ', '.join([x["uri"] for x in message["videos"]]) if "videos" in message else None,
             "type": message["type"],
-            "title": decode_str(conversation_json["title"]),
+            "title": conversation_json["title"],
             "conversation_id": conversation_name,
             "is_still_participant": conversation_json["is_still_participant"],
             "participants": ', '.join(participants),
