@@ -12,7 +12,7 @@ Only Docker.
 
 ### Installing
 
-1. Import you data form facebook in JSON format. Only "Messages" is required. Place the file in the folder "messages".
+1. Import you data form facebook in JSON format. Only "Messages" is required. Place the downloaded folder in etl folder.
 
 2. Run the docker compose with the following command at the root of the project: "docker-composer up -d --build".
 
