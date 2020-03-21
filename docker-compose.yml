@@ -28,3 +28,12 @@ services:
       - fbm_db:fbm_db
     ports:
       - "7000:7000"
+
+  fbm_front:
+    build: "./front"
+    depends_on:
+      - "fbm_api"
+    links:
+      - fbm_api:fbm_api
+    ports:
+      - "3000:3000"

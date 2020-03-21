@@ -15,7 +15,6 @@ class ConversationsList extends Component {
     };
     axios.get('http://127.0.0.1:7000/conversation', config)
     .then(response => {
-      console.log("---->", response.data)
       this.setState({conversations: response.data});
     })
     .catch(error => {
@@ -26,12 +25,14 @@ class ConversationsList extends Component {
   render() {
     const conversations = this.state.conversations;
     return (
-      <div>
-          {
+      <div class="col-sm-6 col-md-6 sidebar">
+        <ul class="list-group">
+        {
             conversations.length ?
-            conversations.map(conversation => <div>{conversation.title} {conversation.nb_messages}</div>) :
+            conversations.map(conversation => <li class="list-group-item d-flex justify-content-between align-items-center">{conversation.title}<span class="badge badge-primary badge-pill">{conversation.nb_messages}</span></li>) :
             null
           }
+        </ul>
       </div>
     );
   }
