@@ -32,7 +32,7 @@ def get_conversations_names():
 def parse_conversation(conversation_json, conversation_name):
     schema = MessageSchema()
     messages = []
-    for message in conversation_json["messages"][0:200]:
+    for message in conversation_json["messages"]:
         participants = [decode_str(x["name"]) for x in conversation_json["participants"]]
         messages.append(schema.load({
             "sender": decode_str(message["sender_name"]),
@@ -44,7 +44,7 @@ def parse_conversation(conversation_json, conversation_name):
             "sticker": message["sticker"].get("uri", None) if "sticker" in message else None,
             "video": ', '.join([x["uri"] for x in message["videos"]]) if "videos" in message else None,
             "type": message["type"],
-            "title": conversation_json["title"],
+            "title": decode_str(conversation_json["title"]),
             "conversation_id": conversation_name,
             "is_still_participant": conversation_json["is_still_participant"],
             "participants": ', '.join(participants),
@@ -58,12 +58,16 @@ def load_messages():
     log.info("{} conversations found".format(len(conversations_names)))
     
     for conversation_name in tqdm(conversations_names):
-        # Open json file
-        conversation_json = open_file("{}/{}/message_1.json".format(get_conf("messages_files_path"), conversation_name))
-        # Create model message and save item in db
-        messages = parse_conversation(conversation_json, conversation_name)
-        for x in messages:
-            Message.create(**x)
+        for i in range(1, 100):
+            filename = "{}/{}/message_{}.json".format(get_conf("messages_files_path"), conversation_name, i)
+            if not os.path.isfile(filename):
+                break
+            # Open json file
+            conversation_json = open_file(filename)
+            # Create model message and save item in db
+            messages = parse_conversation(conversation_json, conversation_name)
+            for x in messages:
+                Message.create(**x)
 
 if __name__ == '__main__':
     load_messages()

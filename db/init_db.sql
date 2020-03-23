@@ -13,7 +13,7 @@ CREATE TABLE `message` (
   `conversation_id` varchar(255),
   `is_still_participant` boolean,
   `participants` longtext,
-  `thread_type` longtext
+  `thread_type` longtext,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
 
