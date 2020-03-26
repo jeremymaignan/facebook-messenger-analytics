@@ -4,7 +4,7 @@ Viewer for personal facebook data.
 
 ## Getting Started
 
-After installing step, go to http://localhost:8001.
+After installing step, go to http://localhost:8080.
 
 ### Prerequisites
 
