@@ -1,4 +1,4 @@
-version: '3.3'
+version: '3.4'
 
 services:
   fbm_etl:
@@ -28,3 +28,14 @@ services:
       - fbm_db:fbm_db
     ports:
       - "7000:7000"
+
+  # for local development
+  api_render:
+    build:
+      context: ./front
+      target: 'develop-stage'
+    ports:
+    - '8080:8080'
+    volumes:
+    - '.:/app'
+    command: /bin/sh -c "npm run serve"
