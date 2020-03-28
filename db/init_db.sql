@@ -17,6 +17,21 @@ CREATE TABLE `message` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
 
+CREATE TABLE `call` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `caller` varchar(255) DEFAULT NULL,
+  `started_at` datetime,
+  `content` longtext,
+  `conversation_id` varchar(255),
+  `is_still_participant` boolean,
+  `participants` longtext,
+  `thread_type` longtext,
+  `duration` int(11),
+  `is_missed` boolean,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
+
+
 -- CREATE TABLE `conversations` (
 --  	`id` int(11) NOT NULL AUTO_INCREMENT,
 -- 	`title` longtext,
