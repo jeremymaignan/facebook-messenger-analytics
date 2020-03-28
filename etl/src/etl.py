@@ -9,17 +9,17 @@
 """
 
 import json
+import logging
 import os
 import sys
 from datetime import datetime
-import logging
 
-from models.message import Message
 from models.call import Call
-from schemas.message import MessageSchema
+from models.message import Message
 from schemas.call import CallSchema
-from utils.utils import get_conf, decode_str, open_file
+from schemas.message import MessageSchema
 from utils.logger import log
+from utils.utils import decode_str, get_conf, open_file
 
 folders_to_ignore = ["stickers_used", '.DS_Store', "connectthedots_0fa20e74fd"]
 
@@ -82,10 +82,8 @@ def load_messages():
             conversation_json = open_file(filename)
             # Create model message and save item in db
             messages, calls = parse_conversation(conversation_json, conversation_name)
-            for x in calls:
-                Call.create(**x)
-            for x in messages:
-                Message.create(**x)
+            Call.insert_many(calls).execute()
+            Message.insert_many(messages).execute()
 
 if __name__ == '__main__':
     logging.basicConfig(
