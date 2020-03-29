@@ -24,24 +24,25 @@ class ConversationApi(Base):
     def get(self, conversation_id=None):
         if not conversation_id:
             output = []
-            conversations = db.execute_sql("select distinct title as t, count(*) as c, max(is_still_participant) from message group by t order by c desc;").fetchall()
+            conversations = db.execute_sql("select distinct title as t, count(*) as c, max(is_still_participant), max(conversation_id) from message group by t order by c desc;").fetchall()
             for conversation in conversations:
                 if conversation[0] == "":
                     continue
                 output.append({
                     "title": conversation[0],
                     "nb_messages": conversation[1],
-                    "is_still_participant": conversation[2]
+                    "is_still_participant": conversation[2],
+                    "conversation_id": conversation[3]
                 })
         else:
             output = {
                 "nb_messages_per_user": [],
-                "title": conversation_id,
                 "messages_per_hour": []
             }
-            conversations = db.execute_sql("select count(*), max(sent_at), min(sent_at), sender, max(is_still_participant) from message where title='{}' group by sender;".format(conversation_id)).fetchall()
+            conversations = db.execute_sql("select count(*), max(sent_at), min(sent_at), sender, max(is_still_participant), max(title) from message where conversation_id='{}' group by sender;".format(conversation_id)).fetchall()
             output["nb_messages"] = sum([x[0] for x in conversations])
             for i, conversation in enumerate(conversations):
+                output["title"] = conversation[5]
                 output["nb_messages_per_user"].append({
                     "user": conversation[3],
                     "nb_message": conversation[0],
@@ -55,7 +56,7 @@ class ConversationApi(Base):
             output["message_per_day"] = round(output["nb_messages"] / (parse(output["last_message"]) - parse(output["first_message"])).days, 2)
 
             # Add array with nb_message per hour
-            messages_per_hour = db.execute_sql("select hour(sent_at) as h, count(*) from message where title='{}' group by h order by h;".format(conversation_id)).fetchall()
+            messages_per_hour = db.execute_sql("select hour(sent_at) as h, count(*) from message where conversation_id='{}' group by h order by h;".format(conversation_id)).fetchall()
             for message in messages_per_hour:
                 output["messages_per_hour"].append({
                     "x": "{}h".format(message[0]),
