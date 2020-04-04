@@ -64,7 +64,10 @@ class CallApi(Base):
                     }
                 participants[call[1]]["nb_call"] += 1
         output["total_duration_pretty"] = format_duration(output["total_duration_sec"])
-        output["average_duration_sec"] = int(output["total_duration_sec"] / output["nb_call"])
+        try:
+            output["average_duration_sec"] = int(output["total_duration_sec"] / output["nb_call"])
+        except ZeroDivisionError:
+            output["average_duration_sec"] = 0
         output["average_duration_pretty"] = format_duration(output["average_duration_sec"])
         output["participants"] = format_participants(participants, output["nb_call"])
         return messages.message(output, namespace=self.get_namespace(request))

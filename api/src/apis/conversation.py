@@ -53,8 +53,10 @@ class ConversationApi(Base):
                 output["is_still_participant"] = bool(conversation[4])
             output["nb_messages_per_user"] = sorted(output["nb_messages_per_user"], key = lambda i: i['nb_message'], reverse=True)
             output.update(self.get_dates(conversations))
-            output["message_per_day"] = round(output["nb_messages"] / (parse(output["last_message"]) - parse(output["first_message"])).days, 2)
-
+            try:
+                output["message_per_day"] = round(output["nb_messages"] / (parse(output["last_message"]) - parse(output["first_message"])).days, 2)
+            except ZeroDivisionError:
+                output["message_per_day"] = 0.0
             # Add array with nb_message per hour
             messages_per_hour = db.execute_sql("select hour(sent_at) as h, count(*) from message where conversation_id='{}' group by h order by h;".format(conversation_id)).fetchall()
             for message in messages_per_hour:
