@@ -24,6 +24,7 @@ def format_duration(duration_sec):
     elif m:
         return "{} Minutes {} Secondes".format(m, s)
     return "{} Secondes".format(s)
+
 def format_participants(participants, nb_call):
     output = []
     for name, value  in participants.items():
