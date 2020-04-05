@@ -1,15 +1,14 @@
 import React, { Component } from 'react'
-import {Hint, RadialChart, XYPlot,DiscreteColorLegend, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, VerticalBarSeries, LineSeries, LineSeriesCanvas, ChartLabel} from 'react-vis'
+import {Hint, RadialChart, XYPlot,DiscreteColorLegend, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, VerticalBarSeries, LineSeries} from 'react-vis'
 import '../../node_modules/react-vis/dist/style.css'
 import API from '../api'
 import formatNumbers from '../utils'
-import {curveCatmullRom} from 'd3-shape';
 
 class ConversationsList extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            conversations: [],
+            conversations: null,
             conversation_id: "",
             conversation_title: null,
             value: false,
@@ -19,6 +18,7 @@ class ConversationsList extends Component {
             search_query: '',
             messages_per_hour: null,
             messages_per_month: null,
+            content: null,
             languages: null
         }
     }
@@ -56,6 +56,18 @@ class ConversationsList extends Component {
             console.log(error)
         })
     }
+
+    updateContent = (conversation_id) => {
+        API.get("/conversation/" + conversation_id + '/messages?data=content')
+        .then(response => {
+            this.setState({content: response.data})
+            console.log(this.state.content)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+    }
+
     updateMessagesPerMonth = (conversation_id) => {
         API.get("/conversation/" + conversation_id + '/messages?data=message_per_month')
         .then(response => {
@@ -101,13 +113,15 @@ class ConversationsList extends Component {
             messages_per_hour: null,
             messages_per_month: null,
             current_conversation: null,
-            languages: null
+            languages: null,
+            content: null
         })
         this.setState({page: "message"})
         this.updateConversationInfo(conversation_id)
         this.updateMessagesPerHour(conversation_id)
         this.updateLanguages(conversation_id)
         this.updateMessagesPerMonth(conversation_id)
+        this.updateContent(conversation_id)
         this.updateCall(conversation_id)
     }
 
@@ -131,25 +145,40 @@ class ConversationsList extends Component {
     }
 
     /* RENDERING FUNCTIONS */
-    renderConversationList = (conversation) => {
+    renderConversationList = () => {
         const search_query = this.state.search_query
+        const conversations = this.state.conversations
+        var tmp_conversations = conversations
 
-        if (search_query !== "" && conversation.title.toLowerCase().indexOf(search_query.toLocaleLowerCase()) === -1)
+        if (conversations === null)
             return null
+        if (search_query !== "")
+            tmp_conversations = conversations.filter(conversation => conversation.title.toLowerCase().indexOf(search_query.toLocaleLowerCase()) !== -1)
         return (
-            <li onClick={() => this.selectConversation(conversation.conversation_id, conversation.title)} className="list-group-item d-flex justify-content-between align-items-center list-group-item-action">
-                {conversation.title}
-                {conversation.is_still_participant === 1 &&
-                    <span className="badge badge-primary badge-pill">
-                        {formatNumbers(conversation.nb_messages)}
-                    </span>
-                }
-                {conversation.is_still_participant === 0 &&
-                    <span className="badge badge-danger badge-pill">
-                        {formatNumbers(conversation.nb_messages)}
-                    </span>
-                }
-            </li>
+            <div>
+                <div className="input-group mb-3">
+                    <input onChange={this.queryConversations} value={search_query} type="text" className="form-control" placeholder="Search" aria-label="Filter the conversations" aria-describedby="button-addon1"/>
+                </div>
+                <ul className="list-group">
+                    {
+                        tmp_conversations.length ? tmp_conversations.map(conversation =>
+                            <li onClick={() => this.selectConversation(conversation.conversation_id, conversation.title)} className="list-group-item d-flex justify-content-between align-items-center list-group-item-action font-weight-light">
+                                {conversation.title}
+                                {conversation.is_still_participant === 1 &&
+                                    <span className="badge badge-primary badge-pill">
+                                        {formatNumbers(conversation.nb_messages)}
+                                    </span>
+                                }
+                                {conversation.is_still_participant === 0 &&
+                                    <span className="badge badge-danger badge-pill">
+                                        {formatNumbers(conversation.nb_messages)}
+                                    </span>
+                                }
+                            </li>
+                        ) : <p className="font-weight-light">No result.</p>
+                    }
+                </ul>
+            </div>
         )
     }
 
@@ -159,6 +188,7 @@ class ConversationsList extends Component {
         const messages_per_month = this.state.messages_per_month
         const conversation_title = this.state.conversation_title
         const languages = this.state.languages
+        const content = this.state.content
         const {value} = this.state
 
         if (conversation_title === null)
@@ -166,7 +196,7 @@ class ConversationsList extends Component {
         return (
             <div>
                 {/* Info */}
-                <h3>Info</h3>
+                <h3 className="font-weight-light">Info</h3>
                 {
                     current_conversation !== null ?
                     <div>
@@ -205,7 +235,7 @@ class ConversationsList extends Component {
                         <br />
 
                         {/* Messages per user */}
-                        <h3>Messages per user:</h3>
+                        <h3 className="font-weight-light">Messages per user:</h3>
                         <table className="table table-hover">
                             <thead>
                                 <tr>
@@ -253,13 +283,11 @@ class ConversationsList extends Component {
                     <div className="text-center">
                         <div className="spinner-border text-primary" role="status">
                             <span className="sr-only"></span>
-                            <br />
                         </div>
-                    <br />
                     </div>
                 }
                 {/* Messages Per Hour */}
-                <h3>Messages Per Hour</h3>
+                <h3 className="font-weight-light">Messages Per Hour</h3>
                 { messages_per_hour !== null ?
                     <div>
                         <XYPlot margin={{bottom: 70, left: 50}} xType="ordinal" width={900} height={400}>
@@ -287,36 +315,31 @@ class ConversationsList extends Component {
                     <div className="text-center">
                         <div className="spinner-border text-primary" role="status">
                             <span className="sr-only"></span>
-                            <br />
                         </div>
-                    <br />
                     </div>
                 }
                 {/* Messages Per Month */}
-                <h3>Messages Per Month</h3>
+                <h3 className="font-weight-light">Messages Per Month</h3>
                 { messages_per_month !== null ?
-                    <div>
-                <XYPlot xType="time" margin={{bottom: 70, left: 50}} width={900} height={400}>
-                <HorizontalGridLines />
-                <VerticalGridLines />
-                <XAxis title="Months" tickLabelAngle={-45}/>
-                <YAxis title="Messages" />
-                <LineSeries
-                    data={messages_per_month}
-                />
-                </XYPlot>
-                    </div>
+                    <XYPlot xType="time" margin={{bottom: 70, left: 50}} width={900} height={400}>
+                        <HorizontalGridLines />
+                        <VerticalGridLines />
+                        <XAxis title="Months" tickLabelAngle={-45}/>
+                        <YAxis title="Messages" />
+                        <LineSeries data={messages_per_month} color="#575fcf"/>
+                    </XYPlot>
                     :
                     <div className="text-center">
                         <div className="spinner-border text-primary" role="status">
                             <span className="sr-only"></span>
-                            <br />
                         </div>
-                    <br />
                     </div>
                 }
                 {/* Languages */}
-                <h3>Languages</h3>
+                <h3 className="font-weight-light">Languages</h3>
+                <div className="alert alert-warning font-weight-light" role="alert">
+                    Only messages with at least 30 characters and 5 words are processed.
+                </div>
                 { languages !== null ? 
                     <table className="table table-hover">
                     <thead>
@@ -346,9 +369,52 @@ class ConversationsList extends Component {
                     <div className="text-center">
                         <div className="spinner-border text-primary" role="status">
                             <span className="sr-only"></span>
-                            <br />
                         </div>
-                    <br />
+                    </div>
+                }
+                 {/* Content */}
+                 <h3 className="font-weight-light">Content</h3>
+                {
+                    content !== null ?
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Messages</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>🎤 Audios</td>
+                                <td>{formatNumbers(content.audios)}</td>
+                            </tr>
+                            <tr>
+                                <td>🎥 Videos</td>
+                                <td>{formatNumbers(content.videos)}</td>
+                            </tr>
+                            <tr>
+                                <td>📷 Photos</td>
+                                <td>{formatNumbers(content.photos)}</td>
+                            </tr>
+                            <tr>
+                                <td>🙂 Stickers</td>
+                                <td>{formatNumbers(content.stickers)}</td>
+                            </tr>
+                            <tr>
+                                <td>🌐 Shares</td>
+                                <td>{formatNumbers(content.shares)}</td>
+                            </tr>
+                            <tr>
+                                <td>🐱 Gifs</td>
+                                <td>{formatNumbers(content.gifs)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    :
+                    <div className="text-center">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="sr-only"></span>
+                        </div>
                     </div>
                 }
             </div>
@@ -362,7 +428,7 @@ class ConversationsList extends Component {
         return (
             <div>
                 {/* Calls */}
-                <h3>Info</h3>
+                <h3 className="font-weight-light">Info</h3>
                 <div className="card">
                     <ul className="list-group list-group-flush">
                         <li className="list-group-item"><b>Number of calls:</b> {calls.nb_call}</li>
@@ -373,7 +439,7 @@ class ConversationsList extends Component {
                 </div>
                 <br />
                 {/* Messages per user */}
-                <h3>Calls per user</h3>
+                <h3 className="font-weight-light">Calls per user</h3>
                 <table className="table table-hover">
                     <thead>
                         <tr>
@@ -400,47 +466,52 @@ class ConversationsList extends Component {
     }
 
     render() {
-        const conversations = this.state.conversations
         const conversation_title = this.state.conversation_title
         const page = this.state.page
-        const search_query = this.state.search_query
+        const conversations = this.state.conversations
 
         return (
-            <div className="container-fluid">
-                <div className="row">
-                    <div className="col-3">
-                        <div className="input-group mb-3">
-                            <input onChange={this.queryConversations} value={search_query} type="text" className="form-control" placeholder="Search" aria-label="Filter the conversations" aria-describedby="button-addon1"/>
-                        </div>
-                        <ul className="list-group">
-                            {
-                                conversations.length ?
-                                conversations.map(conversation => this.renderConversationList(conversation)) :
-                                null
-                            }
-                        </ul>
-                    </div>
-                    <div className="col-6">
-                        {conversation_title !== null &&
-                            <div>
-                                <h1>{conversation_title}</h1>
-                                <ul className="nav nav-tabs justify-content-end">
-                                    <li onClick={() => this.setTab("message")} className="nav-item ">
-                                        <a className="nav-link" href="#">Messages</a>
-                                    </li>
-                                    <li onClick={() => this.setTab("call")} className="nav-item">
-                                        <a className="nav-link" href="#">Calls</a>
-                                    </li>
-                                </ul>
-                                <br />
+            <div>
+                {conversations === null &&
+                <div>
+                        <div className="text-center">
+                            <br />
+                            <br />
+                            <br />
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="sr-only"></span>
                             </div>
-                        }
-                        {
-                            page === "message" && this.renderMessages()
-                        }
-                        {
-                            page === "call" && this.renderCalls()
-                        }
+                            <p className="font-weight-light">Loading conversations</p>
+                        </div>
+                    </div>
+                }
+                <div className="container-fluid">
+                    <div className="row">
+                        <div className="col-3">
+                            {this.renderConversationList()}
+                        </div>
+                        <div className="col-6">
+                            {conversation_title !== null &&
+                                <div>
+                                    <h1 className="font-weight-normal">{conversation_title}</h1>
+                                    <ul className="nav nav-tabs justify-content-end">
+                                        <li onClick={() => this.setTab("message")} className="nav-item ">
+                                            <a className="nav-link" href="#">Messages</a>
+                                        </li>
+                                        <li onClick={() => this.setTab("call")} className="nav-item">
+                                            <a className="nav-link" href="#">Calls</a>
+                                        </li>
+                                    </ul>
+                                    <br />
+                                </div>
+                            }
+                            {
+                                page === "message" && this.renderMessages()
+                            }
+                            {
+                                page === "call" && this.renderCalls()
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

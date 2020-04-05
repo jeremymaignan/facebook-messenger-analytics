@@ -54,11 +54,35 @@ class MessageApi(Base):
             })
         return messages.message(output, namespace=self.get_namespace(request))
 
+    def get_content(self, conversation_id):
+        content = db.execute_sql("""
+        SELECT
+            COUNT(photos),
+            COUNT(video),
+            COUNT(share),
+            COUNT(sticker),
+            COUNT(gifs),
+            COUNT(audio)
+        FROM message
+            WHERE conversation_id='{}'
+        """.format(conversation_id)).fetchall()[0]
+        return messages.message({
+            "photos": content[0],
+            "videos": content[1],
+            "shares": content[2],
+            "stickers": content[3],
+            "gifs": content[4],
+            "audios": content[5]
+        }, namespace=self.get_namespace(request))
+
+
     def get(self, conversation_id=None):
         data_to_get = request.args.get('data')
         if data_to_get == "message_per_hour":
             return self.get_messages_per_hour(conversation_id)
         if data_to_get == "message_per_month":
             return self.get_messages_per_months(conversation_id)
+        if data_to_get == "content":
+            return self.get_content(conversation_id)
 
 registry.register((MessageApi, "get_messages", "/conversation/<string:conversation_id>/messages", "GET"))

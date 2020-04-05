@@ -14,6 +14,7 @@ class MessageSchema(Base):
     share = fields.Str(required=False, allow_none=True)
     sticker = fields.Str(required=False, allow_none=True)
     video = fields.Str(required=False, allow_none=True)
+    audio = fields.Str(required=False, allow_none=True)
     type = fields.Str(validate=validate.OneOf(choices=MessageType.values()))
     title = fields.Str()
     conversation_id = fields.Str()

@@ -24,6 +24,7 @@ class Message(Base):
     share = peewee.CharField()
     sticker = peewee.CharField()
     video = peewee.CharField()
+    audio = peewee.CharField()
     type = peewee.CharField()
     title = peewee.TextField(null=False, default='')
     conversation_id = peewee.CharField()

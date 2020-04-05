@@ -63,11 +63,11 @@ class ConversationApi(Base):
         others = sum([x["nb_messages"] for x in output[4:]])
         output = output[:4]
         output.append({
-                "lang": "others",
-                "language_pretty": "others",
-                "nb_messages": others,
-                "flag": get_conf("flags")["other"]
-            })
+            "lang": "others",
+            "language_pretty": "Others",
+            "nb_messages": others,
+            "flag": get_conf("flags")["other"]
+        })
         return messages.message(output, namespace=self.get_namespace(request))
 
     def get_conversation_info(self, conversation_id):
