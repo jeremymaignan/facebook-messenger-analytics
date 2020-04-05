@@ -57,6 +57,7 @@ def parse_conversation(conversation_json, conversation_name):
                 "photos": ', '.join([x["uri"] for x in message["photos"]]) if "photos" in message else None,
                 "share": message["share"].get("link", None) if "share" in message else None,
                 "sticker": message["sticker"].get("uri", None) if "sticker" in message else None,
+                "audio": message["audio_files"][0].get("uri", None) if "audio_files" in message else None,
                 "video": ', '.join([x["uri"] for x in message["videos"]]) if "videos" in message else None,
                 "type": message["type"],
                 "title": decode_str(conversation_json["title"]),
@@ -75,6 +76,7 @@ def load_messages():
     for c, conversation_name in enumerate(conversations_names):
         path = "{}/{}/".format(get_conf("messages_files_path"), conversation_name)
         nb_file = len([name for name in os.listdir(path) if ".json" in name])
+        log.info("{} files in conversation {}".format(nb_file, conversation_name))
         for i in range(1, nb_file + 1):
             log.info("Conversation: [{}/{}] File: [{}/{}]".format(c, len(conversations_names), i, nb_file))
             filename = "{}/message_{}.json".format(path, i)
