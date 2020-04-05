@@ -82,7 +82,8 @@ class ConversationApi(Base):
                 MIN(sent_at),
                 sender,
                 ANY_VALUE(is_still_participant),
-                ANY_VALUE(title)
+                ANY_VALUE(title),
+                ANY_VALUE(thread_type)
             FROM message
             WHERE conversation_id='{}'
             GROUP BY sender;
@@ -91,6 +92,7 @@ class ConversationApi(Base):
         output["nb_messages"] = sum([x[0] for x in conversations])
         for i, conversation in enumerate(conversations):
             output["title"] = conversation[5]
+            output["is_group_conversation"] = True if conversation[6] == "RegularGroup" else False
             output["nb_messages_per_user"].append({
                 "user": conversation[3],
                 "nb_message": conversation[0],

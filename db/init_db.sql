@@ -14,7 +14,8 @@ CREATE TABLE `message` (
   `is_still_participant` boolean,
   `participants` longtext,
   `thread_type` longtext,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `conversation_id` (`conversation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
 
 CREATE TABLE `call` (

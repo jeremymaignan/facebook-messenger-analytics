@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-import {Hint, RadialChart, XYPlot,DiscreteColorLegend, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, VerticalBarSeries} from 'react-vis'
+import {Hint, RadialChart, XYPlot,DiscreteColorLegend, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, VerticalBarSeries, LineSeries, LineSeriesCanvas, ChartLabel} from 'react-vis'
 import '../../node_modules/react-vis/dist/style.css'
 import API from '../api'
 import formatNumbers from '../utils'
+import {curveCatmullRom} from 'd3-shape';
 
 class ConversationsList extends Component {
     constructor(props) {
@@ -17,6 +18,7 @@ class ConversationsList extends Component {
             page: "message",
             search_query: '',
             messages_per_hour: null,
+            messages_per_month: null,
             languages: null
         }
     }
@@ -36,17 +38,35 @@ class ConversationsList extends Component {
         API.get("/conversation/" + conversation_id + '?data=info')
         .then(response => {
             response.data.is_still_participant = Boolean(response.data.is_still_participant)
+            response.data.is_group_conversation = Boolean(response.data.is_group_conversation)
             this.setState({current_conversation: response.data})
+            console.log(this.state.current_conversation)
         })
         .catch(error => {
             console.log(error)
         })
     }
 
-    updateConversationPerHour = (conversation_id) => {
+    updateMessagesPerHour = (conversation_id) => {
         API.get("/conversation/" + conversation_id + '/messages?data=message_per_hour')
         .then(response => {
             this.setState({messages_per_hour: response.data.messages_per_hour})
+        })
+        .catch(error => {
+            console.log(error)
+        })
+    }
+    updateMessagesPerMonth = (conversation_id) => {
+        API.get("/conversation/" + conversation_id + '/messages?data=message_per_month')
+        .then(response => {
+            var tmp = []
+            for (var item in response.data.messages_per_month) {
+                tmp.push({
+                    "x": new Date(response.data.messages_per_month[item].x),
+                    "y": response.data.messages_per_month[item].y
+                })
+            }
+            this.setState({messages_per_month: tmp})
         })
         .catch(error => {
             console.log(error)
@@ -79,13 +99,15 @@ class ConversationsList extends Component {
             conversation_id: conversation_id,
             conversation_title: conversation_title,
             messages_per_hour: null,
+            messages_per_month: null,
             current_conversation: null,
             languages: null
         })
         this.setState({page: "message"})
         this.updateConversationInfo(conversation_id)
-        this.updateConversationPerHour(conversation_id)
+        this.updateMessagesPerHour(conversation_id)
         this.updateLanguages(conversation_id)
+        this.updateMessagesPerMonth(conversation_id)
         this.updateCall(conversation_id)
     }
 
@@ -134,6 +156,7 @@ class ConversationsList extends Component {
     renderMessages = () => {
         const current_conversation = this.state.current_conversation
         const messages_per_hour = this.state.messages_per_hour
+        const messages_per_month = this.state.messages_per_month
         const conversation_title = this.state.conversation_title
         const languages = this.state.languages
         const {value} = this.state
@@ -149,11 +172,34 @@ class ConversationsList extends Component {
                     <div>
                         <div className="card">
                             <ul className="list-group list-group-flush">
-                                <li className="list-group-item"><b>Number of messages:</b> {formatNumbers(current_conversation.nb_messages)}</li>
-                                <li className="list-group-item"><b>First message:</b> {current_conversation.first_message}</li>
-                                <li className="list-group-item"><b>Last message:</b> {current_conversation.last_message}</li>
-                                <li className="list-group-item"><b>Still in conversation:</b> {current_conversation.is_still_participant.toString()}</li>
-                                <li className="list-group-item"><b>Messages per day:</b> {current_conversation.message_per_day}</li>
+                                <li className="list-group-item">
+                                    <b>Number of messages:</b> {formatNumbers(current_conversation.nb_messages)}
+                                </li>
+                                <li className="list-group-item">
+                                    <b>First message:</b>  {current_conversation.first_message}
+                                </li>
+                                <li className="list-group-item">
+                                    <b>Last message:</b>  {current_conversation.last_message}
+                                </li>
+                                <li className="list-group-item">
+                                    <b>Still in conversation:</b>  {
+                                        current_conversation.is_still_participant === true ?
+                                            <span class="badge badge-success">{current_conversation.is_still_participant.toString()}</span>
+                                        :
+                                            <span class="badge badge-danger">{current_conversation.is_still_participant.toString()}</span>
+                                    }
+                                </li>
+                                <li className="list-group-item">
+                                    <b>Group conversation:</b>  {
+                                        current_conversation.is_group_conversation === true ?
+                                            <span class="badge badge-success">{current_conversation.is_group_conversation.toString()}</span>
+                                        :
+                                            <span class="badge badge-danger">{current_conversation.is_group_conversation.toString()}</span>
+                                    }
+                                </li>
+                                <li className="list-group-item">
+                                    <b>Messages per day:</b>  {current_conversation.message_per_day}
+                                </li>
                             </ul>
                         </div>
                         <br />
@@ -204,16 +250,16 @@ class ConversationsList extends Component {
                         </div>
                     </div>
                     : 
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">Loading...</span>
+                    <div className="text-center">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="sr-only"></span>
                             <br />
                         </div>
                     <br />
                     </div>
                 }
-                {/* Messages over the time */}
-                <h3>Messages over the time</h3>
+                {/* Messages Per Hour */}
+                <h3>Messages Per Hour</h3>
                 { messages_per_hour !== null ?
                     <div>
                         <XYPlot margin={{bottom: 70, left: 50}} xType="ordinal" width={900} height={400}>
@@ -238,9 +284,32 @@ class ConversationsList extends Component {
                         </XYPlot>
                     </div>
                     :
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">Loading...</span>
+                    <div className="text-center">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="sr-only"></span>
+                            <br />
+                        </div>
+                    <br />
+                    </div>
+                }
+                {/* Messages Per Month */}
+                <h3>Messages Per Month</h3>
+                { messages_per_month !== null ?
+                    <div>
+                <XYPlot xType="time" margin={{bottom: 70, left: 50}} width={900} height={400}>
+                <HorizontalGridLines />
+                <VerticalGridLines />
+                <XAxis title="Months" tickLabelAngle={-45}/>
+                <YAxis title="Messages" />
+                <LineSeries
+                    data={messages_per_month}
+                />
+                </XYPlot>
+                    </div>
+                    :
+                    <div className="text-center">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="sr-only"></span>
                             <br />
                         </div>
                     <br />
@@ -274,9 +343,9 @@ class ConversationsList extends Component {
                     </tbody>
                 </table>
                     : 
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">Loading...</span>
+                    <div className="text-center">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="sr-only"></span>
                             <br />
                         </div>
                     <br />
