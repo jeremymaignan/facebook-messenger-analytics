@@ -1,4 +1,4 @@
-CREATE TABLE `message` (
+CREATE TABLE IF NOT EXISTS `message`  (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sender` varchar(255) DEFAULT NULL,
   `sent_at` datetime DEFAULT NULL,
@@ -8,6 +8,7 @@ CREATE TABLE `message` (
   `share` longtext,
   `sticker` longtext,
   `video` longtext,
+  `audio` longtext,
   `type` longtext,
   `title` longtext,
   `conversation_id` varchar(255),
@@ -18,7 +19,7 @@ CREATE TABLE `message` (
   KEY `conversation_id` (`conversation_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
 
-CREATE TABLE `call` (
+CREATE TABLE IF NOT EXISTS `call` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `caller` varchar(255) DEFAULT NULL,
   `started_at` datetime,
