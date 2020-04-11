@@ -13,8 +13,8 @@ import logging
 import os
 import sys
 from datetime import datetime
-from models import db
 
+from models import db
 from models.call import Call
 from models.message import Message
 from schemas.call import CallSchema
@@ -22,23 +22,22 @@ from schemas.message import MessageSchema
 from utils.logger import log
 from utils.utils import decode_str, get_conf, open_file
 
-folders_to_ignore = ["stickers_used", '.DS_Store', "connectthedots_0fa20e74fd"]
+folders_to_ignore = ['.DS_Store']
 
 def get_conversations_names():
     conversations_name = os.listdir(get_conf("messages_files_path"))
-    # Ignore folders which are not a convo
-    for folder_to_ignore in folders_to_ignore:
-        if folder_to_ignore in conversations_name: conversations_name.remove(folder_to_ignore)
-    return conversations_name
+    # Ignore folders which are not a conversation and anonymous conversations
+    return [conversation for conversation in conversations_name if conversation not in folders_to_ignore]
 
 def parse_conversation(conversation_json, conversation_name):
-    schema = MessageSchema()
+    messageSchema = MessageSchema()
+    callSchema = CallSchema()
     messages = []
     calls = []
     for message in conversation_json["messages"]:
         participants = [decode_str(x["name"]) for x in conversation_json["participants"]]
         if  message["type"] == "Call":
-            calls.append({
+            calls.append(callSchema.load({
                 "caller": decode_str(message["sender_name"]),
                 "started_at": datetime.fromtimestamp(message["timestamp_ms"] / 1000.0).isoformat(),
                 "content": decode_str(message.get("content", None)),
@@ -48,9 +47,9 @@ def parse_conversation(conversation_json, conversation_name):
                 "thread_type": conversation_json["thread_type"],
                 "duration": message.get("call_duration", None),
                 "is_missed": message.get("missed", None)
-            })
+            }))
         else:
-            messages.append(schema.load({
+            messages.append(messageSchema.load({
                 "sender": decode_str(message["sender_name"]),
                 "sent_at": datetime.fromtimestamp(message["timestamp_ms"] / 1000.0).isoformat(),
                 "content": message.get("content", None),
@@ -69,6 +68,20 @@ def parse_conversation(conversation_json, conversation_name):
             }))
     return messages, calls
 
+def insert_items(messages, calls):
+    try:
+        Call.insert_many(calls).execute()
+    except:
+        log.error("Reconnect to the DB")
+        db.connection()
+        Call.insert_many(calls).execute()
+    try:
+        Message.insert_many(messages).execute()
+    except:
+        log.error("Reconnect to the DB")
+        db.connection()
+        Message.insert_many(messages).execute()
+
 def load_messages():
     # Get all conversations based on folder name
     conversations_names = get_conversations_names()
@@ -85,18 +98,7 @@ def load_messages():
             conversation_json = open_file(filename)
             # Create model message and save item in db
             messages, calls = parse_conversation(conversation_json, conversation_name)
-            try:
-                Call.insert_many(calls).execute()
-            except:
-                log.error("Reconnect to the DB")
-                db.connection()
-                Call.insert_many(calls).execute()
-            try:
-                Message.insert_many(messages).execute()
-            except:
-                log.error("Reconnect to the DB")
-                db.connection()
-                Message.insert_many(messages).execute()
+            insert_items(messages, calls)
 
 if __name__ == '__main__':
     logging.basicConfig(

@@ -1,7 +1,6 @@
 Flask==1.0.2
 Flask-Cors==3.0.8
 peewee==3.13.1
-tqdm==4.24.0
 marshmallow==3.3.0
 mysql-connector==2.2.9
 PyMySQL==0.9.3

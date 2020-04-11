@@ -1,7 +1,6 @@
 FROM python:3.7
 
 COPY . /var/app/etl/
-#VOLUME ../messages /var/app/etl/messages/
 
 WORKDIR /var/app/etl/
 
