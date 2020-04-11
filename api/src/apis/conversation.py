@@ -131,7 +131,6 @@ class ConversationApi(Base):
             })
         return messages.message(output, namespace=self.get_namespace(request))
 
-
     def get(self, conversation_id=None):
         data_to_get = request.args.get('data')
         if data_to_get == "info":

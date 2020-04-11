@@ -18,6 +18,7 @@ class ConversationsList extends Component {
             search_query: '',
             messages_per_hour: null,
             messages_per_month: null,
+            emojis: null,
             content: null,
             languages: null
         }
@@ -61,6 +62,17 @@ class ConversationsList extends Component {
         API.get("/conversation/" + conversation_id + '/messages?data=content')
         .then(response => {
             this.setState({content: response.data})
+            console.log(this.state.content)
+        })
+        .catch(error => {
+            console.log(error)
+        })
+    }
+
+    updateEmojis = (conversation_id) => {
+        API.get("/conversation/" + conversation_id + '/messages?data=emojis')
+        .then(response => {
+            this.setState({emojis: response.data})
             console.log(this.state.content)
         })
         .catch(error => {
@@ -114,7 +126,8 @@ class ConversationsList extends Component {
             messages_per_month: null,
             current_conversation: null,
             languages: null,
-            content: null
+            content: null,
+            emojis: null
         })
         this.setState({page: "message"})
         this.updateConversationInfo(conversation_id)
@@ -122,6 +135,7 @@ class ConversationsList extends Component {
         this.updateLanguages(conversation_id)
         this.updateMessagesPerMonth(conversation_id)
         this.updateContent(conversation_id)
+        this.updateEmojis(conversation_id)
         this.updateCall(conversation_id)
     }
 
@@ -189,6 +203,7 @@ class ConversationsList extends Component {
         const conversation_title = this.state.conversation_title
         const languages = this.state.languages
         const content = this.state.content
+        const emojis = this.state.emojis
         const {value} = this.state
 
         if (conversation_title === null)
@@ -372,8 +387,8 @@ class ConversationsList extends Component {
                         </div>
                     </div>
                 }
-                 {/* Content */}
-                 <h3 className="font-weight-light">Content</h3>
+                {/* Content */}
+                <h3 className="font-weight-light">Content</h3>
                 {
                     content !== null ?
                     <table className="table table-hover">
@@ -408,6 +423,48 @@ class ConversationsList extends Component {
                                 <td>🐱 Gifs</td>
                                 <td>{formatNumbers(content.gifs)}</td>
                             </tr>
+                        </tbody>
+                    </table>
+                    :
+                    <div className="text-center">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="sr-only"></span>
+                        </div>
+                    </div>
+                }
+                   {/* Emojis */}
+                   <h3 className="font-weight-light">Emojis</h3>
+                {
+                    emojis !== null ?
+                    <table className="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Sender</th>
+                                <th>Top 10 most used emojis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {
+                                emojis.length ? emojis.map(sender  =>
+                                    <tr>
+                                        <th scope="row">{sender.sender}</th>
+                                        <td>
+                                            {
+                                                sender.emoji ? sender.emoji.map(data  =>
+                                                    <span>
+                                                        <span class="badge badge-light"><h6>{data.emoji}: {data.nb_messages}</h6></span>
+                                                        {"        "}
+                                                    </span>
+                                                )
+                                                :
+                                                null
+                                            }
+                                        </td>
+                                    </tr>
+                                )
+                                :
+                                null
+                            }
                         </tbody>
                     </table>
                     :

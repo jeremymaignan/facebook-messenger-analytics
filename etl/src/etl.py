@@ -13,6 +13,7 @@ import logging
 import os
 import sys
 from datetime import datetime
+from models import db
 
 from models.call import Call
 from models.message import Message
@@ -84,8 +85,18 @@ def load_messages():
             conversation_json = open_file(filename)
             # Create model message and save item in db
             messages, calls = parse_conversation(conversation_json, conversation_name)
-            Call.insert_many(calls).execute()
-            Message.insert_many(messages).execute()
+            try:
+                Call.insert_many(calls).execute()
+            except:
+                log.error("Reconnect to the DB")
+                db.connection()
+                Call.insert_many(calls).execute()
+            try:
+                Message.insert_many(messages).execute()
+            except:
+                log.error("Reconnect to the DB")
+                db.connection()
+                Message.insert_many(messages).execute()
 
 if __name__ == '__main__':
     logging.basicConfig(

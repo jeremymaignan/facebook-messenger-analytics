@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `message`  (
+CREATE TABLE IF NOT EXISTS `message` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sender` varchar(255) DEFAULT NULL,
   `sent_at` datetime DEFAULT NULL,

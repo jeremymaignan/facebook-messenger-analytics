@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from flask import request
 
 from apis.base import Base
@@ -7,7 +9,7 @@ from schemas.message import MessageSchema
 from utils import messages
 from utils.logger import log
 from utils.registry import registry
-
+import emoji
 
 class MessageApi(Base):
     name = "message"
@@ -75,14 +77,49 @@ class MessageApi(Base):
             "audios": content[5]
         }, namespace=self.get_namespace(request))
 
+    def get_emojies(self, conversation_id):
+        nb_emojis = {}
+
+        messages_ = db.execute_sql("""
+        SELECT
+            content, sender
+        FROM message
+        WHERE
+            content IS NOT NULL AND
+            content <> "" AND
+            conversation_id='{}';
+        """.format(conversation_id)).fetchall()
+        log.info("{} messages found".format(len(messages_)))
+        for message in messages_:
+            for char in message[0].encode('latin1').decode('utf8'):
+                if char in emoji.UNICODE_EMOJI:
+                    if message[1] not in nb_emojis:
+                        nb_emojis[message[1]] = defaultdict(int)
+                    nb_emojis[message[1]][char] += 1
+        output = []
+        for sender, value in nb_emojis.items():
+            tmp = {
+                "sender": sender,
+                "emoji": []
+            }
+            for emoji_, count in value.items():
+                tmp["emoji"].append({
+                    'emoji': emoji_,
+                    "nb_messages": count
+                })
+                tmp["emoji"] = sorted(tmp["emoji"], key = lambda i: i['nb_messages'], reverse=True)[:10]
+            output.append(tmp)
+        return messages.message(output, namespace=self.get_namespace(request))
 
     def get(self, conversation_id=None):
         data_to_get = request.args.get('data')
         if data_to_get == "message_per_hour":
             return self.get_messages_per_hour(conversation_id)
-        if data_to_get == "message_per_month":
+        elif data_to_get == "message_per_month":
             return self.get_messages_per_months(conversation_id)
-        if data_to_get == "content":
+        elif data_to_get == "content":
             return self.get_content(conversation_id)
+        elif data_to_get == "emojis":
+            return self.get_emojies(conversation_id)
 
 registry.register((MessageApi, "get_messages", "/conversation/<string:conversation_id>/messages", "GET"))
