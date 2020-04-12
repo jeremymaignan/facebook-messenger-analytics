@@ -18,6 +18,17 @@ When you launch the code, 4 steps are processing:
 ## Quick start
 
 ### Download your data on Facebook
+
+1. Go on Facebook website
+2. Settings > Your facebook Information > Download Your Information
+3. Select: **Date Range:** All my data **Format:** Json **Media Quality:** Low
+4. Press Create file
+5. You will now receive an email (with *"Facebook information file requested"* as subject) telling you Facebook is processing your requests
+![text](https://github.com/jeremymaignan/facebook-messenger-analytics/blob/master/screenshots/download_facebook_data.png)
+
+6. A few hours later your will receive another email (with *"Your Facebook information file is ready"* as subject)
+7. Follow the link in the email, click on download to download your data
+
 ### Install Docker
 
 ## Examples
