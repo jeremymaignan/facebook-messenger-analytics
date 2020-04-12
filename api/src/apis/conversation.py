@@ -10,10 +10,13 @@ from schemas.message import MessageSchema
 from utils import messages
 from utils.logger import log
 from utils.registry import registry
-from utils.utils import get_conf
+from utils.utils import get_conf, decode_str
 import langid
 from collections import defaultdict
 import pycountry
+
+
+days_of_week = ["",  "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
 class ConversationApi(Base):
     name = "conversation"
@@ -131,6 +134,70 @@ class ConversationApi(Base):
             })
         return messages.message(output, namespace=self.get_namespace(request))
 
+    def get_messages_per_day(self, conversation_id):
+        output = {}
+        messages_per_day = db.execute_sql("""
+        SELECT 
+            DAYOFWEEK(sent_at) AS d,
+            sender,
+            COUNT(*)
+        FROM message
+        WHERE conversation_id='{}'
+        GROUP BY d, sender;
+        """.format(conversation_id)).fetchall()
+
+        for message in messages_per_day:
+            if message[1] not in output:
+                output[message[1]] = {
+                    "color": get_conf("colors")[len(output)],
+                    "data": []
+                }
+            output[message[1]]["data"].append({
+                "x": days_of_week[int(message[0])],
+                "y": message[2]
+            })
+        print(output)
+        o = []
+        for name, value in output.items():
+            value["data"] = value["data"][1:] + [value["data"][0]]
+            o.append({
+                "title": name, 
+                "color": value["color"],
+                "data": value["data"]
+            })
+        return messages.message(o, namespace=self.get_namespace(request))
+
+    def get_events(self, conversation_id):
+        output = []
+        messages_per_day = db.execute_sql("""
+        SELECT
+            sent_at,
+            content,
+            sender
+        FROM message
+        WHERE
+            conversation_id='{}' AND
+            (type="Subscribe" OR type="Unsubscribe")
+        ORDER BY sent_at;
+        """.format(conversation_id)).fetchall()
+
+        for message in messages_per_day:
+            tmp = {
+                "sent_at": message[0].strftime("%b %d %Y"),
+                "content": decode_str(message[1]).replace(" to the group.", "").replace(" from the group.", "").replace(" the group.", ""),
+                "sender": message[2]
+            }
+            if "added" in tmp["content"]:
+                tmp["content"] = "{} added{}".format(tmp["sender"], tmp["content"].split("added")[1])
+                tmp["change"] = "+1"
+            elif "removed" in tmp["content"]:
+                tmp["content"] = "{} removed{}".format(tmp["sender"], tmp["content"].split("removed")[1])
+                tmp["change"] = "-1"
+            elif "left" in tmp["content"]:
+                tmp["change"] = "-1"
+            output.append(tmp)
+        return messages.message(output, namespace=self.get_namespace(request))
+
     def get(self, conversation_id=None):
         data_to_get = request.args.get('data')
         if data_to_get == "info":
@@ -139,6 +206,11 @@ class ConversationApi(Base):
             return self.get_conversation_list(conversation_id)
         elif data_to_get == "languages":
             return self.get_language(conversation_id)
+        elif data_to_get == "message_per_day":
+            return self.get_messages_per_day(conversation_id)
+        elif data_to_get == "events":
+            return self.get_events(conversation_id)
+        return messages.bad_request("Not Found")
 
 registry.register((ConversationApi, "get_one_conversation", "/conversation/<string:conversation_id>", "GET"))
 registry.register((ConversationApi, "get_conversations", "/conversation", "GET"))
