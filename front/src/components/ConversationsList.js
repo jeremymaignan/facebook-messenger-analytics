@@ -217,12 +217,12 @@ class ConversationsList extends Component {
                         tmp_conversations.length ? tmp_conversations.map(conversation =>
                             <li onClick={() => this.selectConversation(conversation.conversation_id, conversation.title)} className="list-group-item d-flex justify-content-between align-items-center list-group-item-action font-weight-light">
                                 {conversation.title}
-                                {conversation.is_still_participant === 1 &&
+                                {conversation.is_still_participant === true &&
                                     <span className="badge badge-primary badge-pill">
                                         {formatNumbers(conversation.nb_messages)}
                                     </span>
                                 }
-                                {conversation.is_still_participant === 0 &&
+                                {conversation.is_still_participant === false &&
                                     <span className="badge badge-danger badge-pill">
                                         {formatNumbers(conversation.nb_messages)}
                                     </span>

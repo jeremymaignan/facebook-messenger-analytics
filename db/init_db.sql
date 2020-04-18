@@ -32,3 +32,12 @@ CREATE TABLE IF NOT EXISTS `call` (
   `is_missed` boolean,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;
+
+CREATE TABLE IF NOT EXISTS `conversation` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255),
+  `count_messages` int(11),
+  `is_still_participant` boolean,
+  `conversation_id` varchar(255),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_general_ci;

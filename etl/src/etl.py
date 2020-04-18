@@ -82,6 +82,23 @@ def insert_items(messages, calls):
         db.connection()
         Message.insert_many(messages).execute()
 
+def load_conversations():
+    db.execute_sql("""
+        INSERT INTO conversation (
+            title,
+            count_messages,
+            is_still_participant,
+            conversation_id
+        )
+        SELECT
+            DISTINCT title AS t,
+            COUNT(*) as c,
+            ANY_VALUE(is_still_participant),
+            ANY_VALUE(conversation_id)
+        FROM message GROUP BY t;
+        """)
+    log.info("Conversations loaded")
+
 def load_messages():
     # Get all conversations based on folder name
     conversations_names = get_conversations_names()
@@ -99,6 +116,7 @@ def load_messages():
             # Create model message and save item in db
             messages, calls = parse_conversation(conversation_json, conversation_name)
             insert_items(messages, calls)
+    log.info("Message loaded")
 
 if __name__ == '__main__':
     logging.basicConfig(
@@ -106,3 +124,4 @@ if __name__ == '__main__':
         format='%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s'
     )
     load_messages()
+    load_conversations()
