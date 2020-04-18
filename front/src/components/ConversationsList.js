@@ -60,7 +60,7 @@ class ConversationsList extends Component {
     }
 
     updateMessagesPerHour = (conversation_id) => {
-        API.get("/conversation/" + conversation_id + '/messages?data=message_per_hour')
+        API.get("/conversation/" + conversation_id + "/messages_over_time?data=hour")
         .then(response => {
             this.setState({messages_per_hour: response.data.messages_per_hour})
         })
@@ -70,9 +70,26 @@ class ConversationsList extends Component {
     }
 
     updateMessagesPerDay = (conversation_id) => {
-        API.get("/conversation/" + conversation_id + '?data=message_per_day')
+        API.get("/conversation/" + conversation_id + "/messages_over_time?data=day")
         .then(response => {
             this.setState({messages_per_day: response.data})
+        })
+        .catch(error => {
+            console.log(error)
+        })
+    }
+
+    updateMessagesPerMonth = (conversation_id) => {
+        API.get("/conversation/" + conversation_id + "/messages_over_time?data=month")
+        .then(response => {
+            var tmp = []
+            for (var item in response.data.messages_per_month) {
+                tmp.push({
+                    "x": new Date(response.data.messages_per_month[item].x),
+                    "y": response.data.messages_per_month[item].y
+                })
+            }
+            this.setState({messages_per_month: tmp})
         })
         .catch(error => {
             console.log(error)
@@ -115,25 +132,8 @@ class ConversationsList extends Component {
         })
     }
 
-    updateMessagesPerMonth = (conversation_id) => {
-        API.get("/conversation/" + conversation_id + '/messages?data=message_per_month')
-        .then(response => {
-            var tmp = []
-            for (var item in response.data.messages_per_month) {
-                tmp.push({
-                    "x": new Date(response.data.messages_per_month[item].x),
-                    "y": response.data.messages_per_month[item].y
-                })
-            }
-            this.setState({messages_per_month: tmp})
-        })
-        .catch(error => {
-            console.log(error)
-        })
-    }
-
     updateLanguages = (conversation_id) => {
-        API.get("/conversation/" + conversation_id + '?data=languages')
+        API.get("/conversation/" + conversation_id + '/messages?data=languages')
         .then(response => {
             this.setState({languages: response.data})
         })
@@ -262,34 +262,40 @@ class ConversationsList extends Component {
                         <div className="card">
                             <ul className="list-group list-group-flush">
                                 <li className="list-group-item">
-                                    <b>Number of messages:</b> {"     "}{formatNumbers(current_conversation.nb_messages)}
+                                    <b>Number of messages:</b> {" "}{formatNumbers(current_conversation.nb_messages)}
                                 </li>
                                 <li className="list-group-item">
-                                    <b>First message:</b>{"     "}{current_conversation.first_message}
+                                    <b>First message:</b>{" "}{current_conversation.first_message}
                                 </li>
                                 <li className="list-group-item">
-                                    <b>Last message:</b>{"     "}{current_conversation.last_message}
+                                    <b>Last message:</b>{" "}{current_conversation.last_message}
                                 </li>
                                 <li className="list-group-item">
-                                    <b>Still in conversation:</b>
+                                    <b>Still in conversation:</b>{" "}
                                     {
                                         current_conversation.is_still_participant === true ?
-                                            <span className="badge badge-success">{"     "}{current_conversation.is_still_participant.toString()}</span>
+                                            <span className="badge badge-success">{current_conversation.is_still_participant.toString()}</span>
                                         :
-                                            <span className="badge badge-danger">{"     "}{current_conversation.is_still_participant.toString()}</span>
+                                            <span className="badge badge-danger">{current_conversation.is_still_participant.toString()}</span>
                                     }
                                 </li>
                                 <li className="list-group-item">
-                                    <b>Group conversation:</b>
+                                    <b>Group conversation:</b>{" "}
                                     {
                                         current_conversation.is_group_conversation === true ?
-                                            <span className="badge badge-success">{"     "}{current_conversation.is_group_conversation.toString()}</span>
+                                            <span className="badge badge-success">{current_conversation.is_group_conversation.toString()}</span>
                                         :
-                                            <span className="badge badge-danger">{"     "}{current_conversation.is_group_conversation.toString()}</span>
+                                            <span className="badge badge-danger">{current_conversation.is_group_conversation.toString()}</span>
                                     }
                                 </li>
                                 <li className="list-group-item">
-                                    <b>Messages per day:</b>{"   "}{current_conversation.message_per_day}
+                                    <b>Messages per day:</b>{" "}{current_conversation.message_per_day}
+                                </li>
+                                <li className="list-group-item">
+                                    <b>Number of words:</b>{" "}{formatNumbers(current_conversation.nb_words)}
+                                </li>
+                                <li className="list-group-item">
+                                    <b>Words per message:</b>{" "}{current_conversation.words_per_message}
                                 </li>
                             </ul>
                         </div>
@@ -302,8 +308,9 @@ class ConversationsList extends Component {
                                 <tr>
                                     <th>#</th>
                                     <th>Participants</th>
-                                    <th>Number of calls</th>
+                                    <th>Number of Messages</th>
                                     <th>Rate (%)</th>
+                                    <th>Time spent typing (~1.4sec/word)</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -314,6 +321,7 @@ class ConversationsList extends Component {
                                             <td>{user.user}</td>
                                             <td>{formatNumbers(user.nb_message)}</td>
                                             <td>{user.rate}%</td>
+                                            <td>{user.time_spent}</td>
                                         </tr>
                                     ) : null
                                 }
@@ -618,7 +626,7 @@ class ConversationsList extends Component {
                         <tr>
                             <th>#</th>
                             <th>Participants</th>
-                            <th>Number of messages</th>
+                            <th>Number of Calls</th>
                             <th>Rate (%)</th>
                         </tr>
                     </thead>

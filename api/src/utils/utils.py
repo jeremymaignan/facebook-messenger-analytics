@@ -21,3 +21,15 @@ def decode_str(str):
     if not str:
         return str
     return str.encode('latin1').decode('utf8')
+
+def format_duration(duration_sec):
+    m, s = divmod(duration_sec, 60)
+    h, m = divmod(m, 60)
+    d, h = divmod(h, 24)
+    if d:
+        return "{} Days {} Hours {} Minutes {} Secondes".format(int(d), int(h), int(m), int(s))
+    elif h:
+        return "{} Hours {} Minutes {} Secondes".format(int(h), int(m), int(s))
+    elif m:
+        return "{} Minutes {} Secondes".format(int(m), int(s))
+    return "{} Secondes".format(int(s))

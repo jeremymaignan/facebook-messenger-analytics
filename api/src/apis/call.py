@@ -6,24 +6,14 @@ from apis.base import Base
 from models.call import Call
 from schemas.call import CallSchema
 from utils import messages
-from utils.utils import get_conf
+from utils.utils import get_conf, format_duration
 from utils.logger import log
 from utils.registry import registry
 from models import db
 from dateutil.parser import parse
 from collections import defaultdict
 
-def format_duration(duration_sec):
-    m, s = divmod(duration_sec, 60)
-    h, m = divmod(m, 60)
-    d, h = divmod(h, 24)
-    if d:
-        return "{} Days {} Hours {} Minutes {} Secondes".format(d, h, m, s)
-    elif h:
-        return "{} Hours {} Minutes {} Secondes".format(h, m, s)
-    elif m:
-        return "{} Minutes {} Secondes".format(m, s)
-    return "{} Secondes".format(s)
+
 
 def format_participants(participants, nb_call):
     output = []

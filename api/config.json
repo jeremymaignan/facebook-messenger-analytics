@@ -11,10 +11,10 @@
     },
     "log_dir": "/var/log/facebook_messenger",
     "colors": [
-        "#ef5777", "#575fcf", "#34e7e4", "#0be881", "#ffdd59",
-        "#f53b57", "#3c40c6", "#0fbcf9", "#00d8d6", "#05c46b",
+        "#ef5777", "#575fcf", "#34e7e4", "#ffdd59", "#0be881",
+        "#f53b57", "#3c40c6", "#0fbcf9", "#05c46b", "#4bcffa",
         "#ffc048", "#ff5e57", "#d2dae2", "#ffa801", "#ffd32a",
-        "#ff3f34", "#808e9b", "#4bcffa"
+        "#ff3f34", "#808e9b"
     ],
     "flags": {
         "fr": "🇫🇷",
@@ -31,5 +31,15 @@
         "cn": "🇨🇳",
         "ru": "🇷🇺",
         "other": "🏳️"
-    }
+    },
+    "days_of_week": [
+        "",
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+    ]
 }
