@@ -6,6 +6,7 @@ clean:
 	rm -rf etl/messages/*/*/audio; \
 	rm -rf etl/messages/*/*/videos; \
 	rm -rf etl/messages/*/facebookuser*; \
+	rm -rf etl/messages/*/FacebookUser*; \
 	rm -rf etl/messages/stickers_used; \
 	echo "Clean files";
 
