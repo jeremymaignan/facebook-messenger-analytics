@@ -31,4 +31,32 @@ When you launch the code, 4 steps are processing:
 
 ### Install Docker
 
+Follow the instructions: https://docs.docker.com/get-docker/  
+To ensure docker and docker-compose are correctly installed, run:
+```sh
+docker -v
+docker-compose -v
+```
+Make sure you don't have any error.
+
+
+### Start the project
+
+1. Unzip the archive you downloaded from Facebook.
+2. Copy paste the folder **messages** (from the archive) in the project, in the directory **/etl/**.  
+You should have a path looking like *"/elt/messages/inbox/{CONVERSATION_NAME}/message_1.json"*.
+3. To remove userless files, run: 
+```sh
+make clean
+```
+4. To build the project, run:
+```sh
+make build
+```
+This command might take several minutes (depending on the volume of messages you have)
+
+5. Browse your data: http://localhost:3000/
+
+
+
 ## Examples
