@@ -310,7 +310,7 @@ class ConversationsList extends Component {
                                     <th>Participants</th>
                                     <th>Number of Messages</th>
                                     <th>Rate (%)</th>
-                                    <th>Time spent typing (~1.4sec/word)</th>
+                                    <th>Time spent typing*</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -327,6 +327,7 @@ class ConversationsList extends Component {
                                 }
                             </tbody>
                         </table>
+                        <p class="text-secondary font-weight-light"><i>* Estimation based on 1.4 secondes per message.</i></p>
                         <div>
                             <RadialChart
                                 className={'donut-chart-example'}
