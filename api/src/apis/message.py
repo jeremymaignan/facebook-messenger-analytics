@@ -80,22 +80,23 @@ class MessageApi(Base):
     def get_emojies(self, conversation_id):
         nb_emojis = {}
 
-        messages_ = db.execute_sql("""
-        SELECT
-            content, sender
-        FROM message
-        WHERE
-            content IS NOT NULL AND
-            content <> "" AND
-            conversation_id='{}';
-        """.format(conversation_id)).fetchall()
+        # Get all message with a content
+        messages_ = Message.select() \
+            .where(Message.content != None) \
+            .where(Message.content != "") \
+            .where(Message.type == "Generic") \
+            .where(Message.conversation_id == conversation_id)
         log.info("{} messages found".format(len(messages_)))
+
+        # Group emojies by users
         for message in messages_:
-            for char in message[0].encode('latin1').decode('utf8'):
+            for char in message.content.encode('latin1').decode('utf8'):
                 if char in emoji.UNICODE_EMOJI:
-                    if message[1] not in nb_emojis:
-                        nb_emojis[message[1]] = defaultdict(int)
-                    nb_emojis[message[1]][char] += 1
+                    if message.sender not in nb_emojis:
+                        nb_emojis[message.sender] = defaultdict(int)
+                    nb_emojis[message.sender][char] += 1
+
+        # Format output and keep only the top 10
         output = []
         for sender, value in nb_emojis.items():
             tmp = {

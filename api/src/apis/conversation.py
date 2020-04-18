@@ -160,23 +160,17 @@ class ConversationApi(Base):
 
     def get_events(self, conversation_id):
         output = []
-        messages_per_day = db.execute_sql("""
-        SELECT
-            sent_at,
-            content,
-            sender
-        FROM message
-        WHERE
-            conversation_id='{}' AND
-            (type="Subscribe" OR type="Unsubscribe")
-        ORDER BY sent_at;
-        """.format(conversation_id)).fetchall()
-
+        # Get all message with type "Subscribe" or "Unsubscribe"
+        messages_per_day = Message.select() \
+            .where(Message.conversation_id == conversation_id) \
+            .where(Message.type.in_(["Subscribe", "Unsubscribe"])) \
+            .order_by(Message.sent_at.asc())
+        # Format output (clean content and add change +1 or -1)
         for message in messages_per_day:
             tmp = {
-                "sent_at": message[0].strftime("%b %d %Y"),
-                "content": decode_str(message[1]).replace(" to the group.", "").replace(" from the group.", "").replace(" the group.", ""),
-                "sender": message[2]
+                "sent_at": message.sent_at.strftime("%b %d %Y"),
+                "content": decode_str(message.content).replace(" to the group.", "").replace(" from the group.", "").replace(" the group.", ""),
+                "sender": message.sender
             }
             if "added" in tmp["content"]:
                 tmp["content"] = "{} added{}".format(tmp["sender"], tmp["content"].split("added")[1])

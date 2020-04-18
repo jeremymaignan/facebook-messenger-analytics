@@ -1,6 +1,7 @@
 import logging
 import os
 from datetime import datetime
+
 from utils.utils import get_conf
 
 
@@ -16,13 +17,5 @@ def add_file_handler():
         f_handler.setFormatter(f_format)
         log.addHandler(f_handler)
     return log
-
-# c_handler = logging.StreamHandler()
-# c_handler.setLevel(logging.INFO)
-# c_format = logging.Formatter('%(name)s - %(levelname)s - %(message)s')
-# c_handler.setFormatter(c_format)
-# log.addHandler(c_handler)
-# print(getattr(logging, os.environ.get("LOG_LEVEL", "INFO").upper()))
-# print("pass")
 
 log = add_file_handler()
