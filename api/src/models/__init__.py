@@ -3,7 +3,10 @@ from backoff import expo, on_exception
 
 from utils.utils import get_conf
 
-db = peewee.MySQLDatabase(**get_conf("mysql_creds"))
+creds = get_conf("mysql_creds")
+creds["host"] = creds["host"][get_conf("env")]
+db = peewee.MySQLDatabase(**creds)
+
 
 @on_exception(expo, peewee.OperationalError, max_tries=8)
 def create_connection():

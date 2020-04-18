@@ -1,6 +1,9 @@
 {
     "mysql_creds": {
-        "host": "fbm_db",
+        "host": {
+            "LOCAL": "127.0.0.1",
+            "PROD": "fbm_db"
+        },
         "user": "jeremy",
         "password": "password",
         "database": "facebook_messenger",

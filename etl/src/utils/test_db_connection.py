@@ -8,7 +8,7 @@ from utils import get_conf
 def try_connection():
     try:
         mysql.connector.connect(
-            host=get_conf("mysql_creds")["host"],
+            host=get_conf("mysql_creds")["host"][get_conf("ENV")],
             user=get_conf("mysql_creds")["user"],
             password=get_conf("mysql_creds")["password"],
             database=get_conf("mysql_creds")["database"],
