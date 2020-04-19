@@ -72,22 +72,25 @@ def parse_conversation(conversation_json, conversation_name):
 def insert_items(messages, calls):
     try:
         Call.insert_many(calls).execute()
-    except:
+    except Exception as err:
+        log.error(err)
         try:
             time.sleep(5)
             log.error("Reconnect to the DB")
             Call.insert_many(calls).execute()
-        except:
-            pass
+        except Exception as err:
+            log.error(err)
     try:
         Message.insert_many(messages).execute()
-    except:
+    except Exception as err:
+        log.error(err)
         try:
             time.sleep(5)
             log.error("Reconnect to the DB")
             Message.insert_many(messages).execute()
-        except:
-            pass
+        except Exception as err:
+            log.error(err)
+
 
 def load_conversations():
     db.execute_sql("""
