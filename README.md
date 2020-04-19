@@ -61,12 +61,12 @@ This command might take several minutes (depending on the volume of messages you
 
 5. Browse your data: http://localhost:3000/
 
-## Contact
-
-If you need any support or if you have ideas to improve the project, contact me at **jeremy.maignan@gmail.com**.
-
 ## Examples
 ### Messages
 ![Facebook Screenshot](https://github.com/jeremymaignan/facebook-messenger-analytics/blob/master/screenshots/messages.png)
 ### Calls
 ![Facebook Screenshot](https://github.com/jeremymaignan/facebook-messenger-analytics/blob/master/screenshots/calls.png)
+
+## Contact
+
+If you need any support or if you have ideas to improve the project, contact me at jeremy.maignan@gmail.com.
