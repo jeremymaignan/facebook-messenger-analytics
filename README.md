@@ -1,6 +1,5 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-green.svg)](https://shields.io/)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
-
 [![MIT Licence](https://img.shields.io/badge/License-MIT-blue.svg)](https://shields.io/)
 [![Python](https://img.shields.io/badge/python-3.7-yellow.svg)](https://shields.io/)
 # Facebook Messenger Analytics
