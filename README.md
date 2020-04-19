@@ -8,7 +8,7 @@
 
 ## Purpose
 
-This project allows you get insights from your Facebook Messenger data.  
+This project allows you to get insights from your Facebook Messenger data.  
 Facebook allows you to download all your personal data (posts, likes, friends, messages, etc).  
 When you launch the code, 4 steps are processing:
 - A MySQL database is built on your laptop
@@ -17,7 +17,7 @@ When you launch the code, 4 steps are processing:
 - A website is launched (React) to display the insights
 
 ```
- Everthing runs localy. Nothing, including your messages are ever uploaded on an external server.
+ Everthing runs locally. Nothing, including your messages are ever uploaded on an external server.
 ```
 
 ## Quick start
@@ -31,7 +31,7 @@ When you launch the code, 4 steps are processing:
 5. You will now receive an email (with *"Facebook information file requested"* as subject) telling you Facebook is processing your requests  
 ![text](https://github.com/jeremymaignan/facebook-messenger-analytics/blob/master/screenshots/download_facebook_data.png)
 
-6. A few hours later your will receive another email (with *"Your Facebook information file is ready"* as subject)
+6. A few hours later, you will receive another email (with *"Your Facebook information file is ready"* as subject)
 7. Follow the link in the email, click on download to download your data
 
 ### Install Docker
@@ -42,7 +42,7 @@ To ensure docker and docker-compose are correctly installed, run:
 docker -v
 docker-compose -v
 ```
-Make sure you don't have any error.
+Make sure you don't have any errors.
 
 
 ### Start the project
@@ -64,6 +64,6 @@ This command might take several minutes (depending on the volume of messages you
 
 ## Contact
 
-If you need any support or if you have ideas to improve the project, contact me **jeremy.maignan@gmail.com**.
+If you need any support or if you have ideas to improve the project, contact me at **jeremy.maignan@gmail.com**.
 
 ## Examples
