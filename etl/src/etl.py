@@ -11,6 +11,7 @@
 import json
 import logging
 import os
+import time
 import sys
 from datetime import datetime
 
@@ -70,17 +71,25 @@ def parse_conversation(conversation_json, conversation_name):
 
 def insert_items(messages, calls):
     try:
+        db.connect(reuse_if_open=True)
         Call.insert_many(calls).execute()
+        db.close()
     except:
+        time.sleep(2)
         log.error("Reconnect to the DB")
-        db.connection()
+        db.connect(reuse_if_open=True)
         Call.insert_many(calls).execute()
+        db.close()
     try:
+        db.connect(reuse_if_open=True)
         Message.insert_many(messages).execute()
+        db.close()
     except:
+        time.sleep(2)
         log.error("Reconnect to the DB")
-        db.connection()
+        db.connect(reuse_if_open=True)
         Message.insert_many(messages).execute()
+        db.close()
 
 def load_conversations():
     db.execute_sql("""

@@ -11,7 +11,7 @@
     },
     "log_dir": "/var/log/facebook_messenger",
     "colors": [
-        "#ef5777", "#575fcf", "#34e7e4", "#ffdd59", "#0be881",
+        "#ef5777", "#575fcf", "#ffdd59", "#34e7e4", "#0be881",
         "#f53b57", "#3c40c6", "#0fbcf9", "#05c46b", "#4bcffa",
         "#ffc048", "#ff5e57", "#d2dae2", "#ffa801", "#ffd32a",
         "#ff3f34", "#808e9b"
