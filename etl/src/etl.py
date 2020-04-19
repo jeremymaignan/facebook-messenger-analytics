@@ -84,6 +84,7 @@ def insert_items(messages, calls):
         log.error(err)
 
 def load_conversations():
+    db.connect(reuse_if_open=True)
     db.execute_sql("""
         INSERT INTO conversation (
             title,
@@ -98,6 +99,7 @@ def load_conversations():
             ANY_VALUE(conversation_id)
         FROM message GROUP BY t;
         """)
+    db.close()
     log.info("Conversations loaded")
 
 def load_messages():
