@@ -71,25 +71,23 @@ def parse_conversation(conversation_json, conversation_name):
 
 def insert_items(messages, calls):
     try:
-        db.connect(reuse_if_open=True)
         Call.insert_many(calls).execute()
-        db.close()
     except:
-        time.sleep(2)
-        log.error("Reconnect to the DB")
-        db.connect(reuse_if_open=True)
-        Call.insert_many(calls).execute()
-        db.close()
+        try:
+            time.sleep(5)
+            log.error("Reconnect to the DB")
+            Call.insert_many(calls).execute()
+        except:
+            pass
     try:
-        db.connect(reuse_if_open=True)
         Message.insert_many(messages).execute()
-        db.close()
     except:
-        time.sleep(2)
-        log.error("Reconnect to the DB")
-        db.connect(reuse_if_open=True)
-        Message.insert_many(messages).execute()
-        db.close()
+        try:
+            time.sleep(5)
+            log.error("Reconnect to the DB")
+            Message.insert_many(messages).execute()
+        except:
+            pass
 
 def load_conversations():
     db.execute_sql("""
