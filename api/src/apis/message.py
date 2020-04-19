@@ -104,7 +104,11 @@ class MessageApi(Base):
 
         # Group emojies by users
         for message in messages_:
-            for char in message.content.encode('latin1').decode('utf8'):
+            try:
+                tmp = message.content.encode('latin1').decode('utf8')
+            except:
+                continue
+            for char in tmp:
                 if char in emoji.UNICODE_EMOJI:
                     if message.sender not in nb_emojis:
                         nb_emojis[message.sender] = defaultdict(int)

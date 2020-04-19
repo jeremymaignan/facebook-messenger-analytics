@@ -70,18 +70,25 @@ def parse_conversation(conversation_json, conversation_name):
     return messages, calls
 
 def insert_items(messages, calls):
-    try:
-        db.connect(reuse_if_open=True)
-        Call.insert_many(calls).execute()
-        db.close()
-    except Exception as err:
-        log.error(err)
-    try:
-        db.connect(reuse_if_open=True)
-        Message.insert_many(messages).execute()
-        db.close()
-    except Exception as err:
-        log.error(err)
+    for t in range(5):
+        try:
+            db.connect(reuse_if_open=True)
+            Call.insert_many(calls).execute()
+            db.close()
+            break
+        except Exception as err:
+            log.error("Fail to load calls. Retry {} Error: {}".format(t, err))
+            time.sleep(t)
+
+    for t in range(5):
+        try:
+            db.connect(reuse_if_open=True)
+            Message.insert_many(messages).execute()
+            db.close()
+            break
+        except Exception as err:
+            log.error("Fail to load messages. Retry {} Error: {}".format(t, err))
+            time.sleep(t)
 
 def load_conversations():
     db.connect(reuse_if_open=True)
