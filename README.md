@@ -63,9 +63,9 @@ This command might take several minutes (depending on the volume of messages you
 
 ## Examples
 ### Messages
-![Facebook Screenshot](https://github.com/jeremymaignan/facebook-messenger-analytics/blob/master/screenshots/messages.png)
+![Messages Screenshot](https://github.com/jeremymaignan/facebook-messenger-analytics/blob/master/screenshots/messages.png)
 ### Calls
-![Facebook Screenshot](https://github.com/jeremymaignan/facebook-messenger-analytics/blob/master/screenshots/calls.png)
+![Calls Screenshot](https://github.com/jeremymaignan/facebook-messenger-analytics/blob/master/screenshots/calls.png)
 
 ## Contact
 
