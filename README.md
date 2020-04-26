@@ -61,6 +61,11 @@ This command might take several minutes (depending on the volume of messages you
 
 5. Browse your data: http://localhost:3000/
 
+If on the website you see *"No result"*, that means the ETL is still runnning, you will have to wait a few minutes. If you want to follow the progress of the ETL (and make sure there is no error), Run:
+```sh
+docker logs facebook-messenger-analytics_fbm_etl_1
+```
+
 ## Examples
 ### Messages
 ![Messages Screenshot](https://github.com/jeremymaignan/facebook-messenger-analytics/blob/master/screenshots/messages.png)
