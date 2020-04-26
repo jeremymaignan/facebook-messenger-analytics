@@ -109,6 +109,12 @@ def load_conversations():
     db.close()
     log.info("Conversations loaded")
 
+def empty_tables(table_name):
+    db.connect(reuse_if_open=True)
+    db.execute_sql("TRUNCATE `{}`".format(table_name))
+    db.close()
+    log.info("Emptied table {}".format(table_name))
+
 def load_messages():
     # Get all conversations based on folder name
     conversations_names = get_conversations_names()
@@ -133,5 +139,7 @@ if __name__ == '__main__':
         level=getattr(logging, os.environ.get("LOG_LEVEL", "INFO").upper()),
         format='%(asctime)s - %(levelname)s - %(name)s - %(funcName)s - %(message)s'
     )
+    for table in ["message", "conversation", "call"]:
+        empty_tables(table)
     load_messages()
     load_conversations()

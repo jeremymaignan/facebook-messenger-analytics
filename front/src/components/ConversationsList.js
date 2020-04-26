@@ -164,7 +164,8 @@ class ConversationsList extends Component {
             languages: null,
             content: null,
             emojis: null,
-            events: null
+            events: null,
+            calls: null
         })
         this.setState({page: "message"})
         this.updateConversationInfo(conversation_id)
@@ -560,7 +561,7 @@ class ConversationsList extends Component {
                 {/* Events */}
                 <h3 className="font-weight-light">Events</h3>
                 {
-                    current_conversation !== null && current_conversation.is_group_conversation == false ?
+                    current_conversation !== null && current_conversation.is_group_conversation === false ?
                     <div className="alert alert-danger font-weight-light" role="alert">
                         <p className="font-weight-light">Only group conversations have events.</p>
                     </div>
@@ -605,44 +606,64 @@ class ConversationsList extends Component {
 
     renderCalls = () => {
         const calls = this.state.calls
-        if (calls === null)
-            return null
+
+        if (calls && calls.nb_call === 0)
+            return <p className="font-weight-light">No calls in this conversation.</p>
         return (
             <div>
                 {/* Calls */}
                 <h3 className="font-weight-light">Info</h3>
-                <div className="card">
-                    <ul className="list-group list-group-flush">
-                        <li className="list-group-item"><b>Number of calls:</b> {calls.nb_call}</li>
-                        <li className="list-group-item"><b>Number of calls missed:</b> {calls.nb_call_missed}</li>
-                        <li className="list-group-item"><b>Total duration of calls:</b> {calls.total_duration_pretty}</li>
-                        <li className="list-group-item"><b>Average duration of calls:</b> {calls.average_duration_pretty}</li>
-                    </ul>
-                </div>
+                {
+                    calls !== null ?
+                        <div className="card">
+                            <ul className="list-group list-group-flush">
+                                <li className="list-group-item"><b>Number of calls:</b> {calls.nb_call}</li>
+                                <li className="list-group-item"><b>Number of calls missed:</b> {calls.nb_call_missed}</li>
+                                <li className="list-group-item"><b>Total duration of calls:</b> {calls.total_duration_pretty}</li>
+                                <li className="list-group-item"><b>Average duration of calls:</b> {calls.average_duration_pretty}</li>
+                            </ul>
+                        </div>
+                    :
+                        <div className="text-center">
+                            <div className="spinner-border text-primary" role="status">
+                                <span className="sr-only"></span>
+                            </div>
+                        </div>
+                    }
                 <br />
                 {/* Messages per user */}
                 <h3 className="font-weight-light">Calls per user</h3>
-                <table className="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Participants</th>
-                            <th>Number of Calls</th>
-                            <th>Rate (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { calls.participants.length ?
-                        calls.participants.map((participants, index) =>
-                            <tr>
-                                <th scope="row">{index + 1}</th>
-                                <td>{participants.name}</td>
-                                <td>{participants.nb_call}</td>
-                                <td>{participants.rate}%</td>
-                            </tr>
-                        ) : null}
-                    </tbody>
-                </table>
+                {
+                    calls !== null ?
+                        <table className="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Participants</th>
+                                    <th>Number of Calls</th>
+                                    <th>Rate (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                { calls.participants.length ?
+                                    calls.participants.map((participants, index) =>
+                                        <tr>
+                                            <th scope="row">{index + 1}</th>
+                                            <td>{participants.name}</td>
+                                            <td>{participants.nb_call}</td>
+                                            <td>{participants.rate}%</td>
+                                        </tr>
+                                    ) : null
+                                }
+                            </tbody>
+                        </table>
+                    :
+                    <div className="text-center">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="sr-only"></span>
+                        </div>
+                    </div>
+                }
             </div>
         )
     }

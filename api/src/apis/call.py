@@ -1,18 +1,17 @@
+from collections import defaultdict
 from datetime import datetime
 
+from dateutil.parser import parse
 from flask import request
 
 from apis.base import Base
+from models import db
 from models.call import Call
 from schemas.call import CallSchema
 from utils import messages
-from utils.utils import get_conf, format_duration
 from utils.logger import log
 from utils.registry import registry
-from models import db
-from dateutil.parser import parse
-from collections import defaultdict
-
+from utils.utils import format_duration, get_conf
 
 
 def format_participants(participants, nb_call):
@@ -62,4 +61,4 @@ class CallApi(Base):
         output["participants"] = format_participants(participants, output["nb_call"])
         return messages.message(output, namespace=self.get_namespace(request))
 
-registry.register((CallApi, "get_calls", "/conversation/<string:conversation_id>/call/", "GET"))
+registry.register((CallApi, "get_calls", "/conversation/<string:conversation_id>/call", "GET"))
