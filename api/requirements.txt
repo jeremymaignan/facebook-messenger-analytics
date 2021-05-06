@@ -1,5 +1,5 @@
 Flask==1.0.2
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 peewee==3.13.1
 marshmallow==3.3.0
 mysql-connector==2.2.9
